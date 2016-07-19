@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+
+    tools:context="com.ryanchan.chatroom.MainActivity">
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_above="@+id/listFooter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:transcriptMode="alwaysScroll"/>
+
+    <LinearLayout
+        android:id="@+id/listFooter"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:weightSum="1"
+        >
+
+        <EditText
+            android:layout_width="259dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText"
+            android:layout_weight="0.73"
+            android:layout_gravity="bottom"
+            android:hint="type shit here" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SEND"
+            android:id="@+id/button"
+            android:layout_gravity="bottom" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
