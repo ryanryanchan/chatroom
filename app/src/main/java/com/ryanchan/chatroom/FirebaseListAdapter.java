@@ -1,6 +1,9 @@
 package com.ryanchan.chatroom;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +31,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
     private List<T> models;      //list of "models", in this case Chats
     private List<String> keys;   //list of keys, in this case...
     private ChildEventListener mlistener; //the thing that checks for changes
+
 
     public FirebaseListAdapter(Query FBRef, Class<T> modelClass, int layout, Activity activity) {
         this.FBRef = FBRef;
@@ -61,6 +65,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
                     }
                 }
                 notifyDataSetChanged(); //tells the view to refresh itself
+
             }
 
             @Override

@@ -1,10 +1,15 @@
 package com.ryanchan.chatroom;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.TextView;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Query;
 
 import org.w3c.dom.Text;
@@ -19,8 +24,6 @@ public class ChatListAdapter extends FirebaseListAdapter<Chat> {
     public ChatListAdapter(Query ref, Activity activity, int layout, String mUsername) {
         super(ref, Chat.class, layout, activity);
         this.mUsername  = mUsername;
-        
-
     }
 
     @Override

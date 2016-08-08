@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "646689918376",
+    "firebase_url": "https://chat-bbfbf.firebaseio.com",
+    "project_id": "chat-bbfbf",
+    "storage_bucket": "chat-bbfbf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646689918376:android:ecb6804dfda40ec9",
+        "android_client_info": {
+          "package_name": "com.ryanchan.chatroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "646689918376-dbl53vise820qm1hj7553ol1dml28t2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmnLq-Q1-yUk4abhX8w1Pim4-pWFDZZxs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
