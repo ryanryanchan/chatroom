@@ -17,10 +17,14 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +35,8 @@ import com.firebase.client.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
+
+import static com.ryanchan.chatroom.R.id.editText;
 
 
 public class MainActivity extends ListActivity implements View.OnClickListener {
@@ -45,7 +51,10 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     
     private DrawingView drawView;
     private float smallBrush, mediumBrush, largeBrush;
-    private ImageButton newBtn, drawBtn, eraseBtn, saveBtn;
+    private ImageButton newBtn, drawBtn, eraseBtn, saveBtn, typeBtn;
+    private Button sendBtn;
+    private View drawArea, footer;
+    private EditText input;
 
     private static final int REQUEST_WRITE_STORAGE = 112;
 
@@ -57,6 +66,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
         //DRAWING STUFF
         drawView = (DrawingView) findViewById(R.id.drawing);
+        drawArea = (View) findViewById(R.id.drawArea);
+        footer = (View) findViewById(R.id.listFooter);
 
         smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
@@ -75,8 +86,15 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         saveBtn = (ImageButton) findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
 
+        typeBtn = (ImageButton) findViewById(R.id.type_btn);
+        typeBtn.setOnClickListener(this);
 
-        EditText input = (EditText) findViewById(R.id.editText);
+        sendBtn = (Button) findViewById(R.id.send_btn);
+        sendBtn.setOnClickListener(this);
+
+
+
+        input = (EditText) findViewById(editText);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -94,7 +112,19 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             }
         }
 
-
+//        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus) {
+//                    Toast.makeText(getApplicationContext(), "GOT FOCUS!!!!", Toast.LENGTH_SHORT).show();
+//                    drawArea.setVisibility(View.GONE);
+//                }
+//                else {
+//                    Toast.makeText(getApplicationContext(), "LOST FOCUS!!!", Toast.LENGTH_SHORT).show();
+//                    drawArea.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +134,19 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         });
 
 
+        findViewById(R.id.draw).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                drawArea.setVisibility(View.VISIBLE);
+                footer.setVisibility(View.GONE);
+
+                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+            }
+        } );
+
+
     }
 
     @Override
@@ -111,6 +154,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         super.onStart();
 
         final ListView listView = getListView();
+        drawArea.setVisibility(View.GONE);
 
 
         mChatListAdapter = new ChatListAdapter(FB, this, R.layout.chat_message, username);
@@ -129,9 +173,9 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean connected = (Boolean) dataSnapshot.getValue();
                 if(connected) {
-                    Toast.makeText(MainActivity.this, "CONNECTED TO THIS SHIT", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "CONNECTED TO THIS SHIT", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -151,9 +195,17 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
 
+    @Override
+    public void onBackPressed() {
+
+            drawArea.setVisibility(View.GONE);
+            footer.setVisibility(View.VISIBLE);
+
+    }
+
 
     private void send_message() {
-        EditText inputText = (EditText) findViewById(R.id.editText);
+        EditText inputText = (EditText) findViewById(editText);
         String input = inputText.getText().toString();
         if (!input.equals("")) {
             Chat chat = new Chat(input, username);
@@ -298,6 +350,28 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 }
             });
             saveDialog.show();
+
+        } else if (v.getId() == R.id.type_btn){
+            drawArea.setVisibility(View.GONE);
+            footer.setVisibility(View.VISIBLE);
+        }
+
+        else if (v.getId() == R.id.send_btn){
+            drawView.setDrawingCacheEnabled(true);
+            Bitmap bitmap = drawView.getDrawingCache();
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+            byte[] byte_array = bytes.toByteArray();
+            String base64Image = Base64.encodeToString(byte_array, Base64.DEFAULT);
+
+            Chat chat = new Chat(base64Image, username);
+
+            FB.push().setValue(chat);
+            drawView.destroyDrawingCache();
+
+            drawView.startNew();
+
         }
 
     }
@@ -317,19 +391,6 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 UUID.randomUUID().toString() + ".png", "drawing");
 
 
-        byte[] byte_array = bytes.toByteArray();
-        String base64Image = Base64.encodeToString(byte_array, Base64.DEFAULT);
-
-        Chat chat = new Chat(base64Image, username);
-
-        FB.push().setValue(chat);
-
-
-
-
-
-
-
 
         Log.d("IMGSAVED@@@@@@@: ", imgSaved);
         //UploadTask uploadTask = storageRef
@@ -345,6 +406,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
         drawView.destroyDrawingCache();
     }
+
 
 
 }
