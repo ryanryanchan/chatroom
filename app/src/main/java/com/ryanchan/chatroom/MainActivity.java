@@ -1,10 +1,12 @@
 package com.ryanchan.chatroom;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -13,9 +15,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -37,12 +42,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
 import static com.ryanchan.chatroom.R.id.editText;
+import static com.ryanchan.chatroom.R.layout.dialog_signin;
 
 
 public class MainActivity extends ListActivity implements View.OnClickListener {
 
     //private static final String url = "https://chat-bbfbf.firebaseio.com/";
-    private static final String username = "AndroidStudio";
+    private static String username = "";
     Firebase FB = new Firebase("https://chat-bbfbf.firebaseio.com/chat");
 
     private ChatListAdapter mChatListAdapter;
@@ -55,6 +61,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     private Button sendBtn;
     private View drawArea, footer;
     private EditText input;
+
+    private AlertDialog.Builder builder;
 
     private static final int REQUEST_WRITE_STORAGE = 112;
 
@@ -112,19 +120,6 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             }
         }
 
-//        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus) {
-//                    Toast.makeText(getApplicationContext(), "GOT FOCUS!!!!", Toast.LENGTH_SHORT).show();
-//                    drawArea.setVisibility(View.GONE);
-//                }
-//                else {
-//                    Toast.makeText(getApplicationContext(), "LOST FOCUS!!!", Toast.LENGTH_SHORT).show();
-//                    drawArea.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,18 +134,73 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             public void onClick(View view){
                 drawArea.setVisibility(View.VISIBLE);
                 footer.setVisibility(View.GONE);
+                if (getCurrentFocus() != null) {
 
-                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
+                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
             }
         } );
+
+
+
+        if( username == ""){
+            builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose a username:");
+            LayoutInflater inflater = this.getLayoutInflater();
+
+            final View builderView = inflater.inflate(dialog_signin, null);
+            final EditText usernameS = (EditText) builderView.findViewById(R.id.usernameBox);
+            builder.setView(builderView)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            username = usernameS.getText().toString();
+
+                            mChatListAdapter.setmUsername(username);
+
+
+                        }
+                    });
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+
+
+            usernameS.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (s.length() >= 1 && drawBtn.getVisibility() == View.VISIBLE) {
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+                    }
+                    else {
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+                    }
+                }
+            });
+        }
+
 
 
     }
 
     @Override
     public void onStart(){
+
         super.onStart();
 
         final ListView listView = getListView();
@@ -185,7 +235,11 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             }
         });
 
+
+
     }
+
+
 
     @Override
     public void onStop() {
@@ -203,6 +257,21 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Intent intent = new Intent(this, MyService.class);
+        startService(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Intent intent = new Intent(this, MyService.class);
+        stopService(intent);
+    }
 
     private void send_message() {
         EditText inputText = (EditText) findViewById(editText);

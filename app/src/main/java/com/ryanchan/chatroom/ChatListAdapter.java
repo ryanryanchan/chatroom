@@ -30,6 +30,10 @@ public class ChatListAdapter extends FirebaseListAdapter<Chat> {
         this.mUsername  = mUsername;
     }
 
+    public void setmUsername(String s) {
+        mUsername = s;
+    }
+
     @Override
     protected void populateView(View view, Chat chat) {
         String author = chat.getAuthor();
