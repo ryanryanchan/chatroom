@@ -1,9 +1,6 @@
 package com.ryanchan.chatroom;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +9,6 @@ import android.widget.BaseAdapter;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 

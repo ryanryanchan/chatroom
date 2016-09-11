@@ -5,13 +5,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -65,6 +69,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     private AlertDialog.Builder builder;
 
     private static final int REQUEST_WRITE_STORAGE = 112;
+
+    MyService my_service;
 
 
     @Override
@@ -195,6 +201,10 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         }
 
 
+        Intent i = new Intent(this, MyService.class);
+        bindService(i, myConnection, Context.BIND_AUTO_CREATE);
+
+
 
     }
 
@@ -251,26 +261,36 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     @Override
     public void onBackPressed() {
-
             drawArea.setVisibility(View.GONE);
             footer.setVisibility(View.VISIBLE);
-
     }
+
+
+    private ServiceConnection myConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MyService.MyLocalBinder binder = (MyService.MyLocalBinder) service;
+            my_service = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        Intent intent = new Intent(this, MyService.class);
-        startService(intent);
+        MyService.setNotify_on();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        Intent intent = new Intent(this, MyService.class);
-        stopService(intent);
+        drawArea.setVisibility(View.GONE);
+        footer.setVisibility(View.VISIBLE);
+        MyService.setNotify_off();
     }
 
     private void send_message() {

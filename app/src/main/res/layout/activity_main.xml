@@ -116,7 +116,7 @@
             android:layout_height="fill_parent"
             android:id="@+id/editText"
             android:layout_gravity="bottom"
-            android:hint="type shit here"
+            android:hint="write a message..."
             android:layout_weight="0.89" />
 
         <Button
