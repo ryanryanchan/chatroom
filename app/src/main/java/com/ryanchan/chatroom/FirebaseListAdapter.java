@@ -30,7 +30,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
 
 
     public FirebaseListAdapter(Query FBRef, Class<T> modelClass, int layout, Activity activity) {
-        this.FBRef = FBRef;
+        this.FBRef = FBRef.limitToLast(75);
         this.modelClass = modelClass;
         this.mlayout = layout;
         minflater = activity.getLayoutInflater(); //instantiates a layout XML file apparently
