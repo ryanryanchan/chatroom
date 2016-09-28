@@ -1,7 +1,6 @@
 package com.ryanchan.chatroom;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -26,14 +25,12 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -210,7 +207,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     @Override
     public void onStart(){
-
+        //when starting, we make a chatlistAdapter, and make sure we are connected to firebase
         super.onStart();
 
         final ListView listView = getListView();
@@ -233,7 +230,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean connected = (Boolean) dataSnapshot.getValue();
                 if(connected) {
-                    //Toast.makeText(MainActivity.this, "CONNECTED TO THIS SHIT", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "CONNECTED", Toast.LENGTH_SHORT).show();
                 } else {
                     //Toast.makeText(MainActivity.this, "Disconnected from Firebase", Toast.LENGTH_SHORT).show();
                 }
@@ -261,12 +258,14 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     @Override
     public void onBackPressed() {
+        //on back pressed, drawArea disappears
             drawArea.setVisibility(View.GONE);
             footer.setVisibility(View.VISIBLE);
     }
 
 
     private ServiceConnection myConnection = new ServiceConnection() {
+        //starts myservice to enable notifications
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MyService.MyLocalBinder binder = (MyService.MyLocalBinder) service;
@@ -281,12 +280,14 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     @Override
     protected void onPause() {
+        //turn notifications on when paused
         super.onPause();
         MyService.setNotify_on();
     }
 
     @Override
     protected void onResume() {
+        //turn off notifications, put the view back on to typing
         super.onResume();
         drawArea.setVisibility(View.GONE);
         footer.setVisibility(View.VISIBLE);
@@ -294,6 +295,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
     private void send_message() {
+        //takes the text in edittext, converts it into a chat, pushes it onto firebasem, clears text
         EditText inputText = (EditText) findViewById(editText);
         String input = inputText.getText().toString();
         if (!input.equals("")) {
@@ -308,6 +310,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        //handles the clicks for all buttons on screen abnd what should be happening
         if (v.getId() == R.id.draw_btn) {
             //draw button
             final Dialog brushDialog = new Dialog(this);
