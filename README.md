@@ -1,5 +1,7 @@
 # chatroom
 
+Made by Ryan Chan and Aaron Ching
+
 First application to dive into android programming with a backend handled by firebase. 
 Inspired by pictochat on the nintendo DS, it is a chat application that can send both text messages and drawings. 
 pictures are encoded into 64 bit to be sent to the firebase backend,
